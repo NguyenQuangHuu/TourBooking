@@ -37,7 +37,8 @@ public class LoginQueryHandler : IRequestHandler<LoginQuery, LoginResponse>
         var token = _jwtTokenService.GenerateJwtToken(user);
         var refreshToken = _jwtTokenService.GenerateRefreshToken();
         var expiresAt = DateTime.UtcNow.AddDays(7);
-        await _repository.SaveRefreshTokenAsync(refreshToken, expiresAt, user.Id, ct);
+        user.GenerateRefreshToken(refreshToken, expiresAt);
+        await _repository.UpdateUserAsync(user, ct);
         await _unitOfWork.CommitAsync(ct);
         return new LoginResponse(token, refreshToken, expiresAt);
     }

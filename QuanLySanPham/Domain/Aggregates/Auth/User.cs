@@ -13,8 +13,8 @@ public class User : BaseEntity<UserId>, IAggregateRoot
     public string PhoneNumber { get; set; }
     public AccountType Type { get; init; }
 
-    public string RefreshToken { get; set; }
-    public DateTime RefreshTokenExpiration { get; set; }
+    public string? RefreshToken { get; set; }
+    public DateTime? RefreshTokenExpiration { get; set; }
 
     public User()
     {
@@ -35,5 +35,17 @@ public class User : BaseEntity<UserId>, IAggregateRoot
         Email = email;
         PhoneNumber = phoneNumber;
         Type = AccountType.Customer;
+    }
+
+    public void GenerateRefreshToken(string rfToken, DateTime expiresAt)
+    {
+        RefreshToken = rfToken;
+        RefreshTokenExpiration = expiresAt;
+    }
+
+    public void RevokeRefreshToken()
+    {
+        RefreshToken = null;
+        RefreshTokenExpiration = null;
     }
 }

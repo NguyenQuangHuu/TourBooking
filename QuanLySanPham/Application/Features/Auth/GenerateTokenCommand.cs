@@ -26,12 +26,20 @@ public class GenerateTokenCommandHandler : IRequestHandler<GenerateTokenCommand,
     {
         await _unitOfWork.BeginAsync(ct);
         var user = await _authRepository.GetUserByRefreshTokenAsync(request.RefreshToken, ct);
-        if (user is null || user.RefreshTokenExpiration <= DateTime.Now) throw new AuthException("Invalid Credentials");
-        if (!user.RefreshToken.Equals(request.RefreshToken)) throw new AuthException("Invalid Credentials");
+        if (user is null)
+        {
+            throw new AuthException("Invalid Credentials");
+        }
+        if (user.RefreshTokenExpiration <= DateTime.Now)
+        {
+            user.RevokeRefreshToken();
+            throw new AuthException("Invalid Credentials");
+        }
         var newToken = _jwtTokenService.GenerateJwtToken(user);
         var newRfToken = _jwtTokenService.GenerateRefreshToken();
         var expiresAt = DateTime.UtcNow.AddDays(7);
-        await _authRepository.SaveRefreshTokenAsync(newRfToken, expiresAt, user.Id, ct);
+        user.GenerateRefreshToken(newRfToken, expiresAt);
+        await _authRepository.UpdateUserAsync(user, ct);
         await _unitOfWork.CommitAsync(ct);
         var res = new LoginResponse(newToken, newRfToken, expiresAt);
         return res;

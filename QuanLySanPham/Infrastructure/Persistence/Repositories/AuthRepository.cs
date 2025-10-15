@@ -53,13 +53,16 @@ public class AuthRepository : IAuthRepository
         return null;
     }
 
-    public async Task SaveRefreshTokenAsync(string token, DateTime expiresAt, UserId userId, CancellationToken ct)
+    public async Task UpdateUserAsync(User user, CancellationToken ct)
     {
-        var sql = "update users set refresh_token = @RfToken,rf_token_expire = @ExpiresAt where id = @Id";
+        var sql = "update users set password = @Password,email = @Email,phone_number = @PhoneNumber, refresh_token = @RfToken,rf_token_expire = @ExpiresAt where id = @Id";
         await using var command = new NpgsqlCommand(sql, _unitOfWork.Connection, _unitOfWork.Transaction);
-        command.Parameters.Add(new NpgsqlParameter("@RfToken", token));
-        command.Parameters.Add(new NpgsqlParameter("@ExpiresAt", expiresAt));
-        command.Parameters.Add(new NpgsqlParameter("@Id", userId.Value));
+        command.Parameters.Add(new NpgsqlParameter("@Password", user.PasswordHash));
+        command.Parameters.Add(new NpgsqlParameter("@Email", user.Email));
+        command.Parameters.Add(new NpgsqlParameter("@PhoneNumber", user.PhoneNumber));
+        command.Parameters.Add(new NpgsqlParameter("@RfToken", user.RefreshToken));
+        command.Parameters.Add(new NpgsqlParameter("@ExpiresAt", user.RefreshTokenExpiration));
+        command.Parameters.Add(new NpgsqlParameter("@Id", user.Id.Value));
         await command.ExecuteNonQueryAsync(ct);
     }
 

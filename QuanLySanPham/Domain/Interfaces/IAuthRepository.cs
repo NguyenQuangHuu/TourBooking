@@ -9,7 +9,7 @@ public interface IAuthRepository
     Task<UserId?> CreateUserAsync(User user, CancellationToken ct);
     Task<User?> GetUserByUsernameAsync(string username, CancellationToken ct);
 
-    Task SaveRefreshTokenAsync(string token, DateTime expiresAt, UserId userId, CancellationToken ct);
+    Task UpdateUserAsync(User user, CancellationToken ct);
 
     Task<User?> GetUserByRefreshTokenAsync(string refreshToken, CancellationToken ct);
 }
