@@ -1,3 +1,6 @@
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 using QuanLySanPham.Application.Services;
 using QuanLySanPham.Domain.Interfaces;
 using QuanLySanPham.Infrastructure.Persistence.Commons;
@@ -17,6 +20,36 @@ builder.Services.AddOpenApi();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddRouting(options => options.LowercaseUrls = true);
+//Đăng ký JWT Filter
+// đọc secret key từ appsettings.json
+var jwtKey = builder.Configuration["Jwt:Key"];
+var keyBytes = Encoding.UTF8.GetBytes(jwtKey);
+builder.Services.AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true, // kiểm tra issuer
+            ValidateAudience = true, // kiểm tra audience
+            ValidateLifetime = true, // kiểm tra hạn token
+            ValidateIssuerSigningKey = true, // kiểm tra chữ ký
+
+            ValidIssuer = builder.Configuration["Jwt:Issuer"],
+            ValidAudience = builder.Configuration["Jwt:Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(keyBytes)
+        };
+    });
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("CustomerOnly", policy => policy.RequireClaim("UserType","Customer"));
+    options.AddPolicy("EmployeeOnly", policy => policy.RequireClaim("UserType","Employee"));
+});
+
 // Đăng ký Mediator
 builder.Services.AddMediatR(cfg => { cfg.RegisterServicesFromAssembly(typeof(Program).Assembly); });
 builder.Services.AddScoped<IDbContext, DbContext>();
@@ -43,6 +76,6 @@ if (app.Environment.IsDevelopment())
 //app.UseHttpsRedirection();
 app.UseMiddleware<ExceptionMiddleware>();
 app.UseAuthorization();
-
+app.UseAuthentication();
 app.MapControllers();
 app.Run();

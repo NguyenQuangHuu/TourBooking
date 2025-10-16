@@ -1,4 +1,5 @@
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using QuanLySanPham.Application.Features.Auth;
 using QuanLySanPham.Application.DTO.Auth;
@@ -12,6 +13,7 @@ namespace QuanLySanPham.Presentations.APIs;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class AuthController : Controller
 {
     private readonly IMediator _mediator;
@@ -22,6 +24,7 @@ public class AuthController : Controller
     }
 
     [HttpPost("sign-up")]
+    [AllowAnonymous]
     public async Task<IActionResult> RegisterUser([FromBody] RegisterUserRequest request,
         CancellationToken ct = default)
     {
@@ -46,6 +49,7 @@ public class AuthController : Controller
     }
 
     [HttpPost("sign-in")]
+    [AllowAnonymous]
     public async Task<IActionResult> SignIn([FromBody] LoginRequest request, CancellationToken ct)
     {
         try
@@ -62,6 +66,7 @@ public class AuthController : Controller
     }
 
     [HttpPost("rf-token")]
+    [Authorize(Policy="CustomerOnly,EmployeeOnly")]
     public async Task<IActionResult> GenerateTokenByRfToken([FromBody] RefreshTokenRequest rfToken)
     {
         try
@@ -77,8 +82,9 @@ public class AuthController : Controller
     }
 
     [HttpGet("sign-out")]
-    public async Task<IActionResult> SignOut()
+    public async Task<IActionResult> SignOut([FromBody] SignOutRequest signOut, CancellationToken ct)
     {
-        return Ok();
+        var result =  await _mediator.Send(signOut, ct);
+        return Ok(ApiResponse<string>.Ok("Log out success"));
     }
 }

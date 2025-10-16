@@ -1,4 +1,5 @@
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using QuanLySanPham.Application.Features.Tours.Commands;
 using QuanLySanPham.Application.Features.Tours.Queries;
@@ -21,6 +22,7 @@ public class ToursController(IMediator mediator) : Controller
     /// </summary>
     /// <returns>Danh sách TourMaster đã lưu trữ</returns>
     [HttpGet]
+    [Authorize(Roles="Admin")]
     public async Task<IActionResult> GetTourMasters()
     {
         var query = new GetAllTourMastersQuery();
@@ -36,6 +38,7 @@ public class ToursController(IMediator mediator) : Controller
     /// <response code="200">Trả về Id của Tour vừa thêm vào</response>
     /// <response code="400">Request không hợp lệ</response>
     [HttpPost]
+    [Authorize(Roles="Admin")]
     public async Task<IActionResult> AddTourMaster([FromBody] CreateTourMasterRequest createTourMasterRequest)
     {
         List<TourMasterDestination> listDestination = new();
@@ -63,6 +66,7 @@ public class ToursController(IMediator mediator) : Controller
     /// <response code="404">Không tìm thấy</response>
     /// <response code="500">Lỗi hệ thống</response>
     [HttpGet("{id}")]
+    [Authorize(Roles="Admin")]
     public async Task<IActionResult> GetTourMasterById([FromRoute] Guid id)
     {
         if (id == Guid.Empty) return BadRequest("Id không hợp lệ!");
@@ -81,6 +85,7 @@ public class ToursController(IMediator mediator) : Controller
     }
 
     [HttpGet("{id}/tour-instance")]
+    [AllowAnonymous]
     public async Task<IActionResult> GetTourInstanceByTourMasterId([FromRoute] Guid id,
         CancellationToken token = default)
     {
@@ -97,6 +102,7 @@ public class ToursController(IMediator mediator) : Controller
     /// <param name="request">Đối tượng request</param>
     /// <returns>Thành công hoặc thất bại</returns>
     [HttpPost("{id}/tour-instance")]
+    [Authorize(Roles="Admin")]
     public async Task<IActionResult> CreateTourInstance([FromRoute] Guid id,
         [FromBody] CreateTourInstanceRequest request)
     {

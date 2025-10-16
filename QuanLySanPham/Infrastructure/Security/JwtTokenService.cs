@@ -5,6 +5,7 @@ using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using QuanLySanPham.Application.Services;
 using QuanLySanPham.Domain.Aggregates.Auth;
+using QuanLySanPham.Domain.ValueObjects;
 using JwtRegisteredClaimNames = Microsoft.IdentityModel.JsonWebTokens.JwtRegisteredClaimNames;
 
 namespace QuanLySanPham.Infrastructure.Security;
@@ -27,20 +28,32 @@ public class JwtTokenService : IJwtTokenService
 
         var symmetricKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
         var cre = new SigningCredentials(symmetricKey, SecurityAlgorithms.HmacSha256);
-        var claims = new[]
+        var claims = new List<Claim>();
+        if (user.Type.Equals(AccountType.Customer))
         {
-            new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new Claim(JwtRegisteredClaimNames.Email, user.Email)
-        };
+            claims.AddRange(
+                new Claim(JwtRegisteredClaimNames.Sub, user.Username),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString()),
+                new Claim("UserType", user.Type));
+        }else if (user.Type.Equals(AccountType.Employee))
+        {
+            claims.Add(new Claim(JwtRegisteredClaimNames.Sub, user.Username));
+            claims.Add(new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()));
+            claims.Add(new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString()));
+            claims.Add(new Claim("UserType", user.Type));
+            claims.Add(new Claim(ClaimTypes.Role, "Manager"));
+        }
+
         var token = new JwtSecurityToken(
-            issuer,
-            audience,
-            claims,
-            expires: DateTime.Now.AddMinutes(expiresMinutes),
-            signingCredentials: cre
-        );
-        return new JwtSecurityTokenHandler().WriteToken(token);
+                issuer,
+                audience,
+                claims,
+                expires: DateTime.Now.AddMinutes(expiresMinutes),
+                signingCredentials: cre
+            );
+            return new JwtSecurityTokenHandler().WriteToken(token);
+
     }
 
     public string GenerateRefreshToken()
