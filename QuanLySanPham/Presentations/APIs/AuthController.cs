@@ -66,7 +66,7 @@ public class AuthController : Controller
     }
 
     [HttpPost("rf-token")]
-    [Authorize(Policy="CustomerOnly,EmployeeOnly")]
+    [Authorize(Policy="CustomerOrEmployee")]
     public async Task<IActionResult> GenerateTokenByRfToken([FromBody] RefreshTokenRequest rfToken)
     {
         try

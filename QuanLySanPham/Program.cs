@@ -1,6 +1,7 @@
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using QuanLySanPham.Application.Services;
 using QuanLySanPham.Domain.Interfaces;
 using QuanLySanPham.Infrastructure.Persistence.Commons;
@@ -18,7 +19,16 @@ builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 // Đăng ký Swagger
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen( options=>
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "Bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "Nhập 'Bearer' + khoảng trắng + token của bạn.\n\nVí dụ: **Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...**"
+    }));
 builder.Services.AddRouting(options => options.LowercaseUrls = true);
 //Đăng ký JWT Filter
 // đọc secret key từ appsettings.json
@@ -48,6 +58,10 @@ builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("CustomerOnly", policy => policy.RequireClaim("UserType","Customer"));
     options.AddPolicy("EmployeeOnly", policy => policy.RequireClaim("UserType","Employee"));
+    options.AddPolicy("CustomerOrEmployee", policy =>
+        policy.RequireAssertion(context =>
+            context.User.HasClaim("UserType", "Customer") ||
+            context.User.HasClaim("UserType", "Employee")));
 });
 
 // Đăng ký Mediator
