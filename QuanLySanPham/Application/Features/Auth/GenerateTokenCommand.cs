@@ -35,7 +35,7 @@ public class GenerateTokenCommandHandler : IRequestHandler<GenerateTokenCommand,
             user.RevokeRefreshToken();
             throw new AuthException("Invalid Credentials");
         }
-        var newToken = _jwtTokenService.GenerateJwtToken(user);
+        var newToken = _jwtTokenService.GenerateJwtTokenForCustomer(user);
         var newRfToken = _jwtTokenService.GenerateRefreshToken();
         var expiresAt = DateTime.UtcNow.AddDays(7);
         user.GenerateRefreshToken(newRfToken, expiresAt);

@@ -1,7 +1,6 @@
 using MediatR;
 using QuanLySanPham.Application.Exceptions;
 using QuanLySanPham.Application.Services;
-using QuanLySanPham.Domain.Aggregates.Auth;
 using QuanLySanPham.Domain.Interfaces;
 using QuanLySanPham.Presentations.DTOs.Responses;
 
@@ -33,8 +32,8 @@ public class LoginQueryHandler : IRequestHandler<LoginQuery, LoginResponse>
 
         if (!_passwordHasher.VerifyPassword(request.Password, user.PasswordHash))
             throw new AuthException("Password is incorrect");
-
-        var token = _jwtTokenService.GenerateJwtToken(user);
+        
+        var token = _jwtTokenService.GenerateJwtTokenForCustomer(user);
         var refreshToken = _jwtTokenService.GenerateRefreshToken();
         var expiresAt = DateTime.UtcNow.AddDays(7);
         user.GenerateRefreshToken(refreshToken, expiresAt);

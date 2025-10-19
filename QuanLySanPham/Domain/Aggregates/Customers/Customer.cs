@@ -11,18 +11,14 @@ public class Customer : BaseEntity<CustomerId>,IAggregateRoot
     public Gender? Gender { get; set; }
     public string? IdentityCard { get; set; }
     public string? Address { get; set; }
-    public UserId? UserId { get; set; }
-    public Customer(string displayName, DateOnly birthDate, Gender gender, string identityCard, string address)
+    public UserId UserId { get; set; }
+    public Customer(string displayName, DateOnly birthDate, Gender gender, string identityCard, string address,UserId userId)
     {
         DisplayName = displayName;
         BirthDate = birthDate;
         Gender = gender;
         IdentityCard = identityCard;
         Address = address;
-    }
-
-    public void SetUser(UserId userId)
-    {
         UserId = userId;
     }
 

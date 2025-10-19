@@ -5,6 +5,7 @@ using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using QuanLySanPham.Application.Services;
 using QuanLySanPham.Domain.Aggregates.Auth;
+using QuanLySanPham.Domain.Aggregates.Employees;
 using QuanLySanPham.Domain.ValueObjects;
 using JwtRegisteredClaimNames = Microsoft.IdentityModel.JsonWebTokens.JwtRegisteredClaimNames;
 
@@ -19,7 +20,7 @@ public class JwtTokenService : IJwtTokenService
         _configuration = configuration;
     }
 
-    public string GenerateJwtToken(User user)
+    public string GenerateJwtTokenForCustomer(User user)
     {
         var key = _configuration["Jwt:Key"];
         var issuer = _configuration["Jwt:Issuer"];
@@ -29,22 +30,12 @@ public class JwtTokenService : IJwtTokenService
         var symmetricKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
         var cre = new SigningCredentials(symmetricKey, SecurityAlgorithms.HmacSha256);
         var claims = new List<Claim>();
-        if (user.Type.Equals(AccountType.Customer))
-        {
-            claims.AddRange(
+        var iatEpoch = DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString();
+        claims.AddRange(
                 new Claim(JwtRegisteredClaimNames.Sub, user.Username),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString()),
+                new Claim(JwtRegisteredClaimNames.Iat, iatEpoch, ClaimValueTypes.Integer64),
                 new Claim("UserType", user.Type));
-        }else if (user.Type.Equals(AccountType.Employee))
-        {
-            claims.Add(new Claim(JwtRegisteredClaimNames.Sub, user.Username));
-            claims.Add(new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()));
-            claims.Add(new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString()));
-            claims.Add(new Claim("UserType", user.Type));
-            claims.Add(new Claim(ClaimTypes.Role, "Manager"));
-        }
-
         var token = new JwtSecurityToken(
                 issuer,
                 audience,
@@ -54,6 +45,37 @@ public class JwtTokenService : IJwtTokenService
             );
             return new JwtSecurityTokenHandler().WriteToken(token);
 
+    }
+
+    public string GenerateJwtTokenForEmployee(User user, Employee emp)
+    {       
+        var key = _configuration["Jwt:Key"];
+        var issuer = _configuration["Jwt:Issuer"];
+        var audience = _configuration["Jwt:Audience"];
+        var expiresMinutes = int.Parse(_configuration["Jwt:ExpiresMinutes"] ?? "20");
+
+        var symmetricKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
+        var cre = new SigningCredentials(symmetricKey, SecurityAlgorithms.HmacSha256);
+        var claims = new List<Claim>();
+        var iatEpoch = DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString();
+        claims.AddRange(
+            new Claim(JwtRegisteredClaimNames.Sub, user.Username),
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+            new Claim(JwtRegisteredClaimNames.Iat, iatEpoch, ClaimValueTypes.Integer64),
+            new Claim("UserType", user.Type));
+        if (emp.Role.Value is null)
+        {
+                throw new ArgumentNullException(nameof(emp)); 
+        }
+        claims.Add(new Claim(ClaimTypes.Role,emp.Role.Value));
+        var token = new JwtSecurityToken(
+            issuer,
+            audience,
+            claims,
+            expires: DateTime.Now.AddMinutes(expiresMinutes),
+            signingCredentials: cre
+        );
+        return new JwtSecurityTokenHandler().WriteToken(token);
     }
 
     public string GenerateRefreshToken()

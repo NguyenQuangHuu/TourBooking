@@ -13,7 +13,6 @@ namespace QuanLySanPham.Presentations.APIs;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize]
 public class AuthController : Controller
 {
     private readonly IMediator _mediator;

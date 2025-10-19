@@ -14,9 +14,11 @@ public class Employee : BaseEntity<EmployeeId>,IAggregateRoot
     public Gender Gender { get; set; }
     public UserId? UserId { get; set; }
     
-    public string Address { get; set; }
+    public string Department { get; set; }
     
-    public List<Role> Roles { get; set; } = new();
+    public string Address { get; set; }
+
+    public Role Role { get; private set; }
 
     public Employee(string fullName, string email, string phoneNumber, string identityCardNumber, Gender gender,DateOnly dateOfBirth, string address)
     {
@@ -27,7 +29,7 @@ public class Employee : BaseEntity<EmployeeId>,IAggregateRoot
         Gender = gender;
         DateOfBirth = dateOfBirth;
         Address = address;
-        Roles.Add(Role.Employee);
+        Role = Role.Employee;
     }
 
     public void SetAccount(UserId userId)
@@ -35,19 +37,11 @@ public class Employee : BaseEntity<EmployeeId>,IAggregateRoot
         UserId = userId;
     }
 
-    public void AddRole(Role role)
+    public void ChangeRole(Role role)
     {
-        if (!Roles.Contains(role))
+        if (!Role.Equals(role))
         {
-            Roles.Add(role);
-        }
-    }
-
-    public void RemoveRole(Role role)
-    {
-        if (Roles.Contains(role))
-        {
-            Roles.Remove(role);
+            Role  = role;
         }
     }
 
