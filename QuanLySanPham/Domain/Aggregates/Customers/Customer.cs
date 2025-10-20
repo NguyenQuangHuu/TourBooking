@@ -12,6 +12,7 @@ public class Customer : BaseEntity<CustomerId>,IAggregateRoot
     public string? IdentityCard { get; set; }
     public string? Address { get; set; }
     public UserId UserId { get; set; }
+    public Customer(){}
     public Customer(string displayName, DateOnly birthDate, Gender gender, string identityCard, string address,UserId userId)
     {
         DisplayName = displayName;
@@ -21,7 +22,6 @@ public class Customer : BaseEntity<CustomerId>,IAggregateRoot
         Address = address;
         UserId = userId;
     }
-
     public void UpdateCustomer(Customer customer)
     {
         DisplayName = customer.DisplayName;

@@ -7,9 +7,10 @@ using QuanLySanPham.Domain.ValueObjects.Ids;
 
 namespace QuanLySanPham.Application.Features.Customers.Commands;
 
-public record CustomerUpdateInformationCommand(Customer Customer) : IRequest<CustomerId?>;
+public record CustomerUpdateInformationCommand(string DisplayName, DateOnly DateOfBirth, Gender Gender,
+    string IdentityCardNumber, string Address,UserId UserId) : IRequest<Customer>;
 
-public class CustomerUpdateInformationCommandHandler : IRequestHandler<CustomerUpdateInformationCommand, CustomerId?>
+public class CustomerUpdateInformationCommandHandler : IRequestHandler<CustomerUpdateInformationCommand, Customer>
 {
     private readonly ICustomerRepository _customerRepository;
     private readonly IUnitOfWork _unitOfWork;
@@ -19,10 +20,12 @@ public class CustomerUpdateInformationCommandHandler : IRequestHandler<CustomerU
         _customerRepository = customerRepository;
         _unitOfWork = unitOfWork;
     }
-    public async Task<CustomerId?> Handle(CustomerUpdateInformationCommand request, CancellationToken ct)
+    public async Task<Customer> Handle(CustomerUpdateInformationCommand request, CancellationToken ct)
     {
         await _unitOfWork.BeginAsync(ct);
-        var result = await _customerRepository.CreateNewCustomerInformationAsync(request.Customer, ct);
+        Customer customer = new Customer(request.DisplayName, request.DateOfBirth, request.Gender,
+            request.IdentityCardNumber, request.Address, request.UserId);
+        var result = await _customerRepository.CreateNewCustomerInformationAsync(customer, ct);
         await _unitOfWork.CommitAsync(ct);
         return result;
     }

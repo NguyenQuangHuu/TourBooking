@@ -84,6 +84,7 @@ builder.Services.AddAuthorization(options =>
 
 // Đăng ký Mediator
 builder.Services.AddMediatR(cfg => { cfg.RegisterServicesFromAssembly(typeof(Program).Assembly); });
+// đăng ký DI service
 builder.Services.AddScoped<IDbContext, DbContext>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IDestinationRepository, DestinationRepository>();
@@ -91,6 +92,8 @@ builder.Services.AddScoped<ITourManagementRepository, TourManagementRepository>(
 builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
+builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
+builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
 builder.Logging.AddConsole();
 builder.Logging.AddDebug();
 var app = builder.Build();

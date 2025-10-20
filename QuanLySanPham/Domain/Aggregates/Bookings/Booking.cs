@@ -7,5 +7,7 @@ namespace QuanLySanPham.Domain.Aggregates.Bookings;
 public class Booking : BaseEntity<BookingId>
 {
     public TourInstanceId TourInstanceId { get; private set; }
-    public BookingInfo BookingInfo { get; set; }
+    public Quantity Total { get; set; }
+    public BookingStatus BookingStatus { get; set; }
+    public DateTimeOffset BookedDateTime { get;private set; }
 }

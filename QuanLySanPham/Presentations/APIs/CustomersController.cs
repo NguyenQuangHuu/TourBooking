@@ -1,6 +1,8 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using QuanLySanPham.Application.Exceptions;
 using QuanLySanPham.Application.Features.Customers.Commands;
+using QuanLySanPham.Application.Features.Customers.Queries;
 using QuanLySanPham.Domain.Aggregates.Customers;
 using QuanLySanPham.Domain.Exceptions;
 using QuanLySanPham.Domain.ValueObjects.Ids;
@@ -21,8 +23,17 @@ public class CustomersController : Controller
     [HttpGet("{id}")]
     public async Task<IActionResult> GetCustomerInformation([FromRoute] Guid id, CancellationToken ct)
     {
-        await Task.Delay(2000, ct);
-        return Ok();
+        try
+        {
+            var queryById = new GetCustomerById(id);
+            var result = await _mediator.Send(queryById, ct);
+            return Ok(result);
+        }
+        catch (NotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }
+
     }
 
     [HttpPost("{id}")]
@@ -32,9 +43,8 @@ public class CustomersController : Controller
         try
         {
             UserId userId = UserId.From(id);
-            Customer customer = new Customer(request.DisplayName, request.DateOfBirth, request.Gender,
+            var command = new CustomerUpdateInformationCommand(request.DisplayName, request.DateOfBirth, request.Gender,
                 request.IdentityCardNumber, request.Address, userId);
-            var command = new CustomerUpdateInformationCommand(customer);
             var result = await _mediator.Send(command, ct);
             return Ok(result);
         }

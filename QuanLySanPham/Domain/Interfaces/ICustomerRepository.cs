@@ -5,5 +5,6 @@ namespace QuanLySanPham.Domain.Interfaces;
 
 public interface ICustomerRepository
 {
-    Task<CustomerId?> CreateNewCustomerInformationAsync(Customer customer, CancellationToken token);
+    Task<Customer> CreateNewCustomerInformationAsync(Customer customer, CancellationToken token);
+    Task<Customer?> GetCustomerByIdAsync(CustomerId id, CancellationToken token);
 }
