@@ -18,4 +18,8 @@ public interface ITourManagementRepository
 
     Task<IReadOnlyList<TourInstance>> GetTourInstancesByTourMasterIdAsync(TourMasterId tourMasterId,
         CancellationToken token);
+    
+    Task<TourInstance?> GetTourInstanceByIdAsync(TourInstanceId tourInstanceId, CancellationToken token);
+    
+    Task<int> UpdateTourInstanceAsync(TourInstance tourInstance, CancellationToken token);
 }

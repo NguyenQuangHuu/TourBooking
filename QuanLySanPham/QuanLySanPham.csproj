@@ -20,6 +20,7 @@
 
     <ItemGroup>
         <Folder Include="Application\DTO\"/>
+        <Folder Include="Application\Features\BookingTour\" />
         <Folder Include="Infrastructure\Externals\"/>
         <Folder Include="Infrastructure\Identities\"/>
         <Folder Include="Infrastructure\Persistence\Configurations\"/>

@@ -21,4 +21,14 @@ public class TourInstance : BaseEntity<TourInstanceId>
         SlotInfo = slotInfo;
         TourMasterId = tourMasterId;
     }
+
+    public void UpdateAvailableSlot(int quantity)
+    {
+        SlotInfo.UpdateSlot(quantity);
+    }
+
+    public void UpdateMoneyPerPax(double newPrice)
+    {
+        PricePerPax = new Money(newPrice);
+    }
 }

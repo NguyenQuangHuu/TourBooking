@@ -55,12 +55,12 @@ public class AuthController : Controller
         {
             var login = new LoginQuery(request.Username, request.Password);
             var result = await _mediator.Send(login, ct);
-            var response = ApiResponse<LoginResponse>.Ok(result);
+            var response = Result<LoginResponse>.Success(result,200);
             return Ok(response);
         }
         catch (AuthException ex)
         {
-            return BadRequest(ApiResponse<LoginResponse>.Failure(ex.Message));
+            return BadRequest(Result<LoginResponse>.Failure(ex.Message,401));
         }
     }
 
@@ -72,11 +72,11 @@ public class AuthController : Controller
         {
             var invokeToken = new GenerateTokenCommand(rfToken.RefreshToken);
             var result = await _mediator.Send(invokeToken, CancellationToken.None);
-            return Ok(ApiResponse<LoginResponse>.Ok(result));
+            return Ok(Result<LoginResponse>.Success(result,200));
         }
         catch (AuthException ex)
         {
-            return BadRequest(ApiResponse<LoginResponse>.Failure(ex.Message));
+            return BadRequest(Result<LoginResponse>.Failure(ex.Message,400));
         }
     }
 
@@ -84,6 +84,6 @@ public class AuthController : Controller
     public async Task<IActionResult> SignOut([FromBody] SignOutRequest signOut, CancellationToken ct)
     {
         var result =  await _mediator.Send(signOut, ct);
-        return Ok(ApiResponse<string>.Ok("Log out success"));
+        return Ok(Result<string>.Success("Log out success",200));
     }
 }

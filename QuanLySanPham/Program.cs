@@ -71,7 +71,7 @@ builder.Services.AddAuthentication(options =>
             IssuerSigningKey = new SymmetricSecurityKey(keyBytes)
         };
     });
-
+//Cấu hình Policy
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("CustomerOnly", policy => policy.RequireClaim("UserType","Customer"));
@@ -94,6 +94,7 @@ builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
+builder.Services.AddScoped<IBookingRepository, BookingRepository>();
 builder.Logging.AddConsole();
 builder.Logging.AddDebug();
 var app = builder.Build();

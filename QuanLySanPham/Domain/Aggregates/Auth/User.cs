@@ -1,3 +1,4 @@
+using QuanLySanPham.Domain.Aggregates.Bookings;
 using QuanLySanPham.Domain.Commons;
 using QuanLySanPham.Domain.Exceptions;
 using QuanLySanPham.Domain.ValueObjects;
@@ -15,7 +16,9 @@ public class User : BaseEntity<UserId>, IAggregateRoot
 
     public string? RefreshToken { get; set; }
     public DateTime? RefreshTokenExpiration { get; set; }
-
+    
+    private readonly List<BookingId> _bookingIds = new();
+    public IReadOnlyList<BookingId> BookingIds => _bookingIds.AsReadOnly();
     public User()
     {
     }
@@ -47,5 +50,14 @@ public class User : BaseEntity<UserId>, IAggregateRoot
     {
         RefreshToken = null;
         RefreshTokenExpiration = null;
+    }
+
+    public void AddBookingId(BookingId bookingId)
+    {
+        if (_bookingIds.Contains(bookingId))
+        {
+            throw new DomainException("Đã tồn tại trong booking");
+        }
+        _bookingIds.Add(bookingId);
     }
 }

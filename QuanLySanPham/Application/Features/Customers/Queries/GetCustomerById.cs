@@ -7,7 +7,7 @@ using QuanLySanPham.Presentations.DTOs.Responses;
 
 namespace QuanLySanPham.Application.Features.Customers.Queries;
 
-public class GetCustomerById:IRequest<ApiResponse<Customer>>
+public class GetCustomerById:IRequest<Result<Customer>>
 {
     public CustomerId CustomerId { get; set; }
 
@@ -17,7 +17,7 @@ public class GetCustomerById:IRequest<ApiResponse<Customer>>
     }
 }
 
-public class GetCustomerByIdHandler : IRequestHandler<GetCustomerById, ApiResponse<Customer>>
+public class GetCustomerByIdHandler : IRequestHandler<GetCustomerById, Result<Customer>>
 {
     private readonly IUnitOfWork  _unitOfWork;
     private readonly ICustomerRepository _customerRepository;
@@ -27,17 +27,17 @@ public class GetCustomerByIdHandler : IRequestHandler<GetCustomerById, ApiRespon
         _unitOfWork = unitOfWork;
         _customerRepository = customerRepository;
     }
-    public async Task<ApiResponse<Customer>> Handle(GetCustomerById request, CancellationToken cancellationToken)
+    public async Task<Result<Customer>> Handle(GetCustomerById request, CancellationToken cancellationToken)
     {
         try
         {
             await _unitOfWork.BeginAsync(cancellationToken);
             Customer customer = await _customerRepository.GetCustomerByIdAsync(request.CustomerId, cancellationToken);
-            return ApiResponse<Customer>.Ok(customer);
+            return Result<Customer>.Success(customer, StatusCodes.Status200OK);
         }
         catch (NotFoundException ex)
         {
-            return ApiResponse<Customer>.Failure(ex.Message);
+            return Result<Customer>.Failure(ex.Message, StatusCodes.Status404NotFound);
         }
     }
 }

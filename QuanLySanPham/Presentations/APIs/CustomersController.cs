@@ -50,7 +50,7 @@ public class CustomersController : Controller
         }
         catch (DomainException ex)
         {
-            return BadRequest(ApiResponse<string>.Failure(ex.Message));
+            return BadRequest(Result<string>.Failure(ex.Message,StatusCodes.Status400BadRequest));
         }
 
 

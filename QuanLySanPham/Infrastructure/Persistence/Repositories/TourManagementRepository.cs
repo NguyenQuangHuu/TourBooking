@@ -1,5 +1,6 @@
 using Npgsql;
 using QuanLySanPham.Domain.Aggregates.Tours;
+using QuanLySanPham.Domain.Exceptions;
 using QuanLySanPham.Domain.Interfaces;
 using QuanLySanPham.Domain.ValueObjects;
 using QuanLySanPham.Infrastructure.Commons;
@@ -164,5 +165,39 @@ public class TourManagementRepository : ITourManagementRepository
         }
 
         return list;
+    }
+
+    public async Task<TourInstance?> GetTourInstanceByIdAsync(TourInstanceId tourInstanceId, CancellationToken ct)
+    {
+        string sql = "select * from tour_instance where id = @TourInstanceId";
+        await using var command = new NpgsqlCommand(sql, _uow.Connection, _uow.Transaction);
+        command.Parameters.Add(new NpgsqlParameter("@TourInstanceId", tourInstanceId.Value));
+        await using var reader = await command.ExecuteReaderAsync(ct);
+        if (await reader.ReadAsync(ct))
+        {
+            return new TourInstance
+            {
+                Id = TourInstanceId.From(reader.GetGuid(0)),
+                PricePerPax = new Money(reader.GetDouble(1)),
+                OperationalPeriod  = new DateRange(DateOnly.FromDateTime(reader.GetDateTime(2)),DateOnly.FromDateTime(reader.GetDateTime(3))),
+                SlotInfo = new SlotInfo(reader.GetInt32(5), reader.GetInt32(4))
+            };
+        }
+
+        return null;
+    }
+
+    public async Task<int> UpdateTourInstanceAsync(TourInstance tourInstance, CancellationToken token)
+    {
+        string sql =
+            "update tour_instance set price_per_pax= @PricePerPax,booked_slots = @BookedSlot,opened_slots = @OpenedSlot,available_slots = @AvailableSlot where id = @Id";
+        await using NpgsqlCommand cmd = new NpgsqlCommand(sql, _uow.Connection, _uow.Transaction);
+        cmd.Parameters.Add(new NpgsqlParameter("@Id", tourInstance.Id.Value));
+        cmd.Parameters.Add(new NpgsqlParameter("@PricePerPax", tourInstance.PricePerPax.Amount));
+        cmd.Parameters.Add(new NpgsqlParameter("@OpenedSlot", tourInstance.SlotInfo.OpenedSlot));
+        cmd.Parameters.Add(new NpgsqlParameter("@BookedSlot", tourInstance.SlotInfo.BookedSlot));
+        cmd.Parameters.Add(new NpgsqlParameter("@AvailableSlot", tourInstance.SlotInfo.AvailableSlot));
+        var result = await cmd.ExecuteNonQueryAsync(token);
+        return result;
     }
 }

@@ -6,4 +6,7 @@ public class BookingTourRequest
 {
     [Required]
     public Guid TourInstanceId { get; set; }
+    [Required]
+    public int TotalSlots { get; set; }
+
 }

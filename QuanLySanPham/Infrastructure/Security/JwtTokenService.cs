@@ -32,7 +32,7 @@ public class JwtTokenService : IJwtTokenService
         var claims = new List<Claim>();
         var iatEpoch = DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString();
         claims.AddRange(
-                new Claim(JwtRegisteredClaimNames.Sub, user.Username),
+                new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new Claim(JwtRegisteredClaimNames.Iat, iatEpoch, ClaimValueTypes.Integer64),
                 new Claim("UserType", user.Type));
@@ -59,7 +59,7 @@ public class JwtTokenService : IJwtTokenService
         var claims = new List<Claim>();
         var iatEpoch = DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString();
         claims.AddRange(
-            new Claim(JwtRegisteredClaimNames.Sub, user.Username),
+            new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
             new Claim(JwtRegisteredClaimNames.Iat, iatEpoch, ClaimValueTypes.Integer64),
             new Claim("UserType", user.Type));

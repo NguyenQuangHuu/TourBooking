@@ -6,8 +6,8 @@ namespace QuanLySanPham.Domain.ValueObjects;
 public class SlotInfo : ValueObject
 {
     public int OpenedSlot { get; set; }
-    private int BookedSlot { get; set; }
-    private int AvailableSlot { get; set; }
+    public int BookedSlot { get; set; }
+    public int AvailableSlot { get; set; }
 
     public SlotInfo()
     {
@@ -28,6 +28,22 @@ public class SlotInfo : ValueObject
         OpenedSlot = openedSlot;
         BookedSlot = bookedSlot;
         AvailableSlot = OpenedSlot - BookedSlot;
+    }
+
+    public void UpdateSlot(int quantity)
+    {
+        if (CanBooking(quantity))
+        {
+            BookedSlot =+quantity;
+            AvailableSlot =-quantity;
+        }
+    }
+
+    private bool CanBooking(int quantity)
+    {
+        if (quantity < 0) throw new DomainException("Quantity cannot be less than 0");
+        if (quantity > AvailableSlot) return false;
+        return true;
     }
 
     protected override IEnumerable<object?> GetEqualityComponents()
