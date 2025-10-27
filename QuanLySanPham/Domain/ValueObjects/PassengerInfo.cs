@@ -11,11 +11,13 @@ public class PassengerInfo : ValueObject
     public string IdentityCardNo { get; set; }
     public string PassportNo { get; set; }
 
-    public PassengerInfo(string fullName, DateOnly dateOfBirth, Gender gender)
+    public PassengerInfo(string fullName, DateOnly dateOfBirth, Gender gender,string identityNo,string passportNo)
     {
         FullName = fullName;
         DateOfBirth = dateOfBirth;
         Gender = gender;
+        IdentityCardNo = identityNo;
+        PassportNo = passportNo;
         AgeGroup = AgeGroup.CalculateAgeGroup(dateOfBirth);
     }
     protected override IEnumerable<object?> GetEqualityComponents()
@@ -23,6 +25,8 @@ public class PassengerInfo : ValueObject
         yield return FullName;
         yield return DateOfBirth;
         yield return Gender;
+        yield return IdentityCardNo;
+        yield return PassportNo;
         yield return AgeGroup;
     }
 }

@@ -6,14 +6,14 @@ namespace QuanLySanPham.Domain.Aggregates.Bookings;
 
 public class Booking : BaseEntity<BookingId>, IAggregateRoot
 {
-    public TourInstanceId TourInstanceId { get; private set; }
-    public UserId  UserId { get; private set; } // customer hoặc employee book
-    public Quantity Total { get; private set; }
-    public BookingStatus BookingStatus { get; private set; }
+    public TourInstanceId TourInstanceId { get; set; }
+    public UserId  UserId { get; set; } // customer hoặc employee book
+    public Quantity Total { get; set; }
+    public BookingStatus BookingStatus { get; set; }
 
     private readonly List<Passenger> _passengers = new();
     public IReadOnlyList<Passenger> Passengers => _passengers.AsReadOnly();
-    private Booking(){}
+    public Booking(){}
 
     public Booking(UserId userId, TourInstanceId tourInstanceId, Quantity total)
     {
