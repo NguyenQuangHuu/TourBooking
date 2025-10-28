@@ -49,12 +49,12 @@ public class AddPassengerCommandHandler : IRequestHandler<AddPassengerCommand, R
             passengers.Add(passenger);
         }
         var result = await _bookingRepository.AddPassengersByBookingIdAsync(request.BookingId,passengers,request.UserId,ct);
-        if (result != -1)
+        if (result != 0)
         {
             booking.BookingStatus = BookingStatus.Confirmed;
             await _bookingRepository.UpdateBookingAsync(booking, ct);
             await _unitOfWork.CommitAsync(ct);
-            return Result<BookingId>.Success(request.BookingId, result);
+            return Result<BookingId>.Success(request.BookingId,StatusCodes.Status201Created);
         }
         await _unitOfWork.RollbackAsync(ct);
         return Result<BookingId>.Failure("Cập nhật hành khách không thành công",StatusCodes.Status400BadRequest);

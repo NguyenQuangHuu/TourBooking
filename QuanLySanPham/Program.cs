@@ -86,7 +86,13 @@ builder.Services.AddAuthorization(options =>
 builder.Services.AddMediatR(cfg => { cfg.RegisterServicesFromAssembly(typeof(Program).Assembly); });
 // đăng ký DI service
 builder.Services.AddScoped<IDbContext, DbContext>();
-builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+/*builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<IDomainEventDispatcher, UnitOfWork>();
+builder.Services.AddScoped<ITrackedEntities, UnitOfWork>();*/
+builder.Services.AddScoped<UnitOfWork>(); // đăng ký gốc
+builder.Services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<UnitOfWork>());
+builder.Services.AddScoped<IDomainEventDispatcher>(sp => sp.GetRequiredService<UnitOfWork>());
+builder.Services.AddScoped<ITrackedEntities>(sp => sp.GetRequiredService<UnitOfWork>());
 builder.Services.AddScoped<IDestinationRepository, DestinationRepository>();
 builder.Services.AddScoped<ITourManagementRepository, TourManagementRepository>();
 builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
