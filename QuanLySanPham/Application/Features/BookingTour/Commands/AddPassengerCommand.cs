@@ -37,7 +37,7 @@ public class AddPassengerCommandHandler : IRequestHandler<AddPassengerCommand, R
             return Result<BookingId>.Failure("Invalid Profile",StatusCodes.Status400BadRequest);
         }
 
-        if (booking.Total.Value != request.Passengers.Count)
+        if (booking.TotalSlots.Value != request.Passengers.Count)
         {
             return Result<BookingId>.Failure("Invalid Passenger quantity",StatusCodes.Status400BadRequest);
         }

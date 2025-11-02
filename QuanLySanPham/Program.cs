@@ -50,8 +50,8 @@ builder.Services.AddSwaggerGen(options =>
 builder.Services.AddRouting(options => options.LowercaseUrls = true);
 //Đăng ký JWT Filter
 // đọc secret key từ appsettings.json
-var jwtKey = builder.Configuration["Jwt:Key"];
-var keyBytes = Encoding.UTF8.GetBytes(jwtKey.ToString());
+var jwtKey = builder.Configuration["Jwt:Key"] ?? throw new ArgumentException("JwtKey is not valid!");
+var keyBytes = Encoding.UTF8.GetBytes(jwtKey);
 builder.Services.AddAuthentication(options =>
     {
         options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -65,9 +65,10 @@ builder.Services.AddAuthentication(options =>
             ValidateAudience = true, // kiểm tra audience
             ValidateLifetime = true, // kiểm tra hạn token
             ValidateIssuerSigningKey = true, // kiểm tra chữ ký
-
+            
             ValidIssuer = builder.Configuration["Jwt:Issuer"],
             ValidAudience = builder.Configuration["Jwt:Audience"],
+
             IssuerSigningKey = new SymmetricSecurityKey(keyBytes)
         };
     });
@@ -86,9 +87,13 @@ builder.Services.AddAuthorization(options =>
 builder.Services.AddMediatR(cfg => { cfg.RegisterServicesFromAssembly(typeof(Program).Assembly); });
 // đăng ký DI service
 builder.Services.AddScoped<IDbContext, DbContext>();
-/*builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+/*
+ việc tiêm DI này vào ở cấp độ scoped sẽ tạo ra 3 instance củaunitofwork cho 3 interface sử dụng, 
+ nên chúng không dùng chung dữ liệu trong 1 lần request
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IDomainEventDispatcher, UnitOfWork>();
-builder.Services.AddScoped<ITrackedEntities, UnitOfWork>();*/
+builder.Services.AddScoped<ITrackedEntities, UnitOfWork>();
+*/
 builder.Services.AddScoped<UnitOfWork>(); // đăng ký gốc
 builder.Services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<UnitOfWork>());
 builder.Services.AddScoped<IDomainEventDispatcher>(sp => sp.GetRequiredService<UnitOfWork>());
@@ -117,7 +122,7 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-//app.UseHttpsRedirection();
+app.UseHttpsRedirection();
 app.UseMiddleware<ExceptionMiddleware>();
 app.UseAuthentication();
 app.UseAuthorization();

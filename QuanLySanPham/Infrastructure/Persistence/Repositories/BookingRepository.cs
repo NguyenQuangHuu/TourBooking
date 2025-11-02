@@ -20,11 +20,12 @@ public class BookingRepository : IBookingRepository
     public async Task<Booking> CreateBookingAsync(Booking booking, CancellationToken ct)
     {
         string sql =
-            "insert into bookings(total_amount, booking_status,tour_instance_id,user_id) values(@TotalSlots,@BookingStatus,@TourInstanceId,@UserId) returning id ";
+            "insert into bookings(total_slots,total_amount, booking_status,tour_instance_id,user_id) values(@TotalAmount,@TotalSlots,@BookingStatus,@TourInstanceId,@UserId) returning id ";
 
         await using NpgsqlCommand cmd =
             new NpgsqlCommand(sql, _unitOfWork.Connection, _unitOfWork.Transaction);
-        cmd.Parameters.Add(new NpgsqlParameter("@TotalSlots", booking.Total.Value));
+        cmd.Parameters.Add(new NpgsqlParameter("@TotalSlots", booking.TotalSlots.Value));
+        cmd.Parameters.Add(new NpgsqlParameter("@TotalAmount", booking.TotalAmount.Amount));
         cmd.Parameters.Add(new NpgsqlParameter("@BookingStatus", booking.BookingStatus.Value));
         cmd.Parameters.Add(new NpgsqlParameter("@TourInstanceId", booking.TourInstanceId.Value));
         cmd.Parameters.Add(new NpgsqlParameter("@UserId", booking.UserId.Value));
@@ -41,25 +42,26 @@ public class BookingRepository : IBookingRepository
     public async Task UpdateBookingAsync(Booking booking, CancellationToken ct)
     {
         string sql =
-            "update bookings set total_amount = @TotalSlots, booking_status = @BookingStatus,tour_instance_id = @TourInstanceId,user_id = @UserId where id = @BookingId ";
+            "update bookings set total_amount = @TotalAmount,total_slots = @TotalSlots, booking_status = @BookingStatus,tour_instance_id = @TourInstanceId,user_id = @UserId where id = @BookingId ";
 
         await using NpgsqlCommand cmd =
             new NpgsqlCommand(sql, _unitOfWork.Connection, _unitOfWork.Transaction);
-        cmd.Parameters.Add(new NpgsqlParameter("@TotalSlots", booking.Total.Value));
+        cmd.Parameters.Add(new NpgsqlParameter("@TotalSlots", booking.TotalSlots.Value));
+        cmd.Parameters.Add(new NpgsqlParameter("@TotalAmount", booking.TotalAmount.Amount));
         cmd.Parameters.Add(new NpgsqlParameter("@BookingStatus", booking.BookingStatus.Value));
         cmd.Parameters.Add(new NpgsqlParameter("@TourInstanceId", booking.TourInstanceId.Value));
         cmd.Parameters.Add(new NpgsqlParameter("@UserId", booking.UserId.Value));
         cmd.Parameters.Add(new NpgsqlParameter("@BookingId", booking.Id.Value));
         int result = await cmd.ExecuteNonQueryAsync(ct);
-        if (result<0)
+        if (result<=0)
         {
-            throw new InfrastructureException("Cannot insert");
+            throw new InfrastructureException("Không thể cập nhật, có lỗi xảy ra!");
         }
     }
 
     public async Task<Booking?> GetBookingByIdAsync(BookingId bookingId, CancellationToken ct)
     {
-        string sql = "select id,user_id,tour_instance_id,total_amount,booking_status from bookings where id = @Id";
+        string sql = "select id,user_id,tour_instance_id,total_amount,total_slots,booking_status from bookings where id = @Id";
         await using NpgsqlCommand cmd = new NpgsqlCommand(sql, _unitOfWork.Connection, _unitOfWork.Transaction);
         cmd.Parameters.Add(new NpgsqlParameter("@Id", bookingId.Value));
         await using NpgsqlDataReader reader = await cmd.ExecuteReaderAsync(ct);
@@ -70,8 +72,9 @@ public class BookingRepository : IBookingRepository
                 Id = BookingId.From(reader.GetGuid(0)),
                 UserId = UserId.From(reader.GetGuid(1)),
                 TourInstanceId = TourInstanceId.From(reader.GetGuid(2)),
-                Total = new Quantity(reader.GetInt32(3)),
-                BookingStatus = BookingStatus.From(reader.GetString(4))
+                TotalAmount = new Money(reader.GetInt32(3)),
+                TotalSlots = new Quantity(reader.GetInt32(4)),
+                BookingStatus = BookingStatus.From(reader.GetString(5))
             };
         }
 

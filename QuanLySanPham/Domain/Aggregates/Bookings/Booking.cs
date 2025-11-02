@@ -8,19 +8,22 @@ public class Booking : BaseEntity<BookingId>, IAggregateRoot
 {
     public TourInstanceId TourInstanceId { get; set; }
     public UserId  UserId { get; set; } // customer hoặc employee book
-    public Quantity Total { get; set; }
+    public Quantity TotalSlots { get; set; }
     public BookingStatus BookingStatus { get; set; }
+    
+    public Money TotalAmount { get; set; }
 
     private readonly List<Passenger> _passengers = new();
     public IReadOnlyList<Passenger> Passengers => _passengers.AsReadOnly();
     public Booking(){}
 
-    public Booking(UserId userId, TourInstanceId tourInstanceId, Quantity total)
+    public Booking(UserId userId, TourInstanceId tourInstanceId, Quantity totalSlots,Money pricePerPax)
     {
         UserId = userId;
         TourInstanceId = tourInstanceId;
-        Total = total;
+        TotalSlots = totalSlots;
         BookingStatus = BookingStatus.Pending;
+        TotalAmount = new Money(TotalSlots.Value * pricePerPax.Amount);
     }
 
     public void AddPassengers(List<Passenger> passenger)

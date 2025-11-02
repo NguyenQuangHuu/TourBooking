@@ -5,6 +5,7 @@ using QuanLySanPham.Application.Features.Auth;
 using QuanLySanPham.Application.DTO.Auth;
 using QuanLySanPham.Application.Exceptions;
 using QuanLySanPham.Application.Features.Auth.Queries;
+using QuanLySanPham.Application.Features.Commands.Auth;
 using QuanLySanPham.Domain.Exceptions;
 using QuanLySanPham.Presentations.DTOs.Requests;
 using QuanLySanPham.Presentations.DTOs.Responses;
@@ -81,9 +82,11 @@ public class AuthController : Controller
     }
 
     [HttpGet("sign-out")]
-    public async Task<IActionResult> SignOut([FromBody] SignOutRequest signOut, CancellationToken ct)
+    [Authorize(Policy = "Customer")]
+    public async Task<IActionResult> SignOut([FromBody] SignOutRequest request, CancellationToken ct)
     {
-        var result =  await _mediator.Send(signOut, ct);
+        var signOutCommand = new CustomerSignOutCommand(request.Username);
+        var result = await _mediator.Send(signOutCommand, ct);
         return Ok(Result<string>.Success("Log out success",200));
     }
 }

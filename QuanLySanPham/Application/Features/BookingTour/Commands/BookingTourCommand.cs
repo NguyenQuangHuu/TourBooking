@@ -52,7 +52,7 @@ public class BookingTourCommandHandler : IRequestHandler<BookingTourCommand, Res
             await _tourManagementRepository.UpdateTourInstanceAsync(tour, ct);
             tour.AddDomainEvent(new UpdatedTourInstanceEvent(tour.Id));
             _trackedEntities.TrackEntity(tour);
-            Booking booking = new Booking(request.UserId, request.TourInstanceId, new Quantity(request.TotalSlots));
+            Booking booking = new Booking(request.UserId, request.TourInstanceId, new Quantity(request.TotalSlots),tour.PricePerPax);
             var createBooking = await _bookingRepository.CreateBookingAsync(booking, ct);
             createBooking.AddDomainEvent(new TourBookedEvent(createBooking.Id));
             _trackedEntities.TrackEntity(createBooking);
