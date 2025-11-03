@@ -48,14 +48,12 @@ public class BookingTourCommandHandler : IRequestHandler<BookingTourCommand, Res
                 return Result<Booking>.Failure("TourInstance does not exist", StatusCodes.Status404NotFound);
             }
 
-            tour.UpdateAvailableSlot(request.TotalSlots);
-            await _tourManagementRepository.UpdateTourInstanceAsync(tour, ct);
-            tour.AddDomainEvent(new UpdatedTourInstanceEvent(tour.Id));
-            _trackedEntities.TrackEntity(tour);
             Booking booking = new Booking(request.UserId, request.TourInstanceId, new Quantity(request.TotalSlots),tour.PricePerPax);
             var createBooking = await _bookingRepository.CreateBookingAsync(booking, ct);
-            createBooking.AddDomainEvent(new TourBookedEvent(createBooking.Id));
-            _trackedEntities.TrackEntity(createBooking);
+            booking.AddDomainEvent(new CreatedBookingTourEvent(booking));
+            _trackedEntities.TrackEntity(booking);
+            tour.AddDomainEvent(new TourSeatsReversedEvent(tour,request.TotalSlots));
+            _trackedEntities.TrackEntity(tour);
             await _unitOfWork.CommitAsync(ct);
             return Result<Booking>.Success(createBooking, StatusCodes.Status201Created);
         }

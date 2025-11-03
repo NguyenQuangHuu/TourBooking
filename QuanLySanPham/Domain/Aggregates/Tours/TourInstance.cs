@@ -31,4 +31,10 @@ public class TourInstance : BaseEntity<TourInstanceId>
     {
         PricePerPax = new Money(newPrice);
     }
+
+    public void SeatReverse(int quantity)
+    {
+        SlotInfo.BookedSlot += quantity;
+        SlotInfo.AvailableSlot -= quantity;
+    }
 }

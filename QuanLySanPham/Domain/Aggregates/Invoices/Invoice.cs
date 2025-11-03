@@ -12,6 +12,8 @@ public class Invoice : BaseEntity<InvoiceId>
     public Money TotalAmount { get; init; }
     public Money PaidAmount { get; set; }
     public InvoiceStatus InvoiceStatus { get; set; }
+    public DateTime  CreatedOn { get; init; }
+    public Invoice(){}
 
     public Invoice(BookingId  bookingId, UserId userId, Money totalAmount)
     {
@@ -20,6 +22,7 @@ public class Invoice : BaseEntity<InvoiceId>
         TotalAmount = totalAmount;
         PaidAmount = new Money(0.0);
         InvoiceStatus = InvoiceStatus.Unpaid;
+        CreatedOn = DateTime.UtcNow;
     }
 
     private void UpdateInvoiceStatus(InvoiceStatus invoiceStatus)
@@ -38,12 +41,8 @@ public class Invoice : BaseEntity<InvoiceId>
     {
         if (InvoiceStatus == InvoiceStatus.Unpaid)
         {
-            PaidAmount = TotalAmount;
+            PaidAmount.Amount = TotalAmount.Amount;
             UpdateInvoiceStatus(InvoiceStatus.Paid);
-        }
-        else
-        {
-            throw new DomainException("Trạng thái hóa đơn không hợp lệ");
         }
     }
 
@@ -52,10 +51,6 @@ public class Invoice : BaseEntity<InvoiceId>
         if (InvoiceStatus == InvoiceStatus.Unpaid)
         {
             UpdateInvoiceStatus(InvoiceStatus.Canceled);
-        }
-        else
-        {
-            throw new DomainException("Trạng thái hóa đơn không hợp lệ");
         }
     }
 
@@ -66,11 +61,5 @@ public class Invoice : BaseEntity<InvoiceId>
             PaidAmount = new Money(0.0);
             UpdateInvoiceStatus(InvoiceStatus.Refunded);
         }
-        else
-        {
-            throw new DomainException("Trạng thái hóa đơn không hợp lệ");
-        }
     }
-    
-    
 }

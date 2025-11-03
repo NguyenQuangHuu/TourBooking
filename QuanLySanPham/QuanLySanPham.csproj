@@ -26,6 +26,7 @@
         <Folder Include="Infrastructure\Externals\"/>
         <Folder Include="Infrastructure\Identities\"/>
         <Folder Include="Infrastructure\Persistence\Configurations\"/>
+        <Folder Include="Infrastructure\Persistence\Services\" />
     </ItemGroup>
 
 </Project>
