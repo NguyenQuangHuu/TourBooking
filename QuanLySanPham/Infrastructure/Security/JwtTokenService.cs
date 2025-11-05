@@ -2,6 +2,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using Jose;
 using Microsoft.IdentityModel.Tokens;
 using QuanLySanPham.Application.Services;
 using QuanLySanPham.Domain.Aggregates.Auth;
@@ -43,8 +44,21 @@ public class JwtTokenService : IJwtTokenService
                 expires: DateTime.Now.AddMinutes(expiresMinutes),
                 signingCredentials: cre
             );
-            return new JwtSecurityTokenHandler().WriteToken(token);
+        
+        var jws = new JwtSecurityTokenHandler().WriteToken(token);
+        using var aes = Aes.Create();
+        aes.KeySize = 256;
+        aes.GenerateKey();
+        var encryptionKey = Encoding.UTF8.GetBytes(_configuration["Jwt:EncryptionKey"] ?? "default-encryption-key-32B!!");
+        // 3️⃣ Mã hóa JWS -> thành JWE
+        string jwe = JWT.Encode(
+            jws,
+            encryptionKey,
+            JweAlgorithm.DIR,            // dùng key trực tiếp
+            JweEncryption.A256GCM        // thuật toán mã hóa AES-GCM 256 bit
+        );
 
+        return jwe;
     }
 
     public string GenerateJwtTokenForEmployee(User user, Employee emp)
@@ -75,7 +89,21 @@ public class JwtTokenService : IJwtTokenService
             expires: DateTime.Now.AddMinutes(expiresMinutes),
             signingCredentials: cre
         );
-        return new JwtSecurityTokenHandler().WriteToken(token);
+        var jws = new JwtSecurityTokenHandler().WriteToken(token);
+        return jws;
+        // using var aes = Aes.Create();
+        // aes.KeySize = 256;
+        // aes.GenerateKey();
+        // var encryptionKey = Encoding.UTF8.GetBytes(_configuration["Jwt:EncryptionKey"] ?? "default-encryption-key-32B!!");
+        // // 3️⃣ Mã hóa JWS -> thành JWE
+        // string jwe = JWT.Encode(
+        //     jws,
+        //     encryptionKey,
+        //     JweAlgorithm.DIR,            // dùng key trực tiếp
+        //     JweEncryption.A256GCM        // thuật toán mã hóa AES-GCM 256 bit
+        // );
+        //
+        // return jwe;
     }
 
     public string GenerateRefreshToken()

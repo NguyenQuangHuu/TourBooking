@@ -26,7 +26,7 @@ public class CreatedBookingTourEventHandler : INotificationHandler<CreatedBookin
 
     public async Task Handle(CreatedBookingTourEvent notification, CancellationToken cancellationToken)
     {
-        _logger.LogInformation($"{nameof(CreatedBookingTourEvent)}");
+        _logger.LogInformation($"{nameof(CreatedBookingTourEvent)} - {notification.Booking.UserId} - Đã đặt tour - {notification.Booking.Id}");
         await Task.CompletedTask;
     }
 }

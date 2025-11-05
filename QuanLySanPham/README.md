@@ -21,3 +21,28 @@
 ## Tìm hiểu về Domain Driven Design
     DDD là một nguyên lý thiết kế hệ thống chung được đưa ra để lập trình viên tập trung xử lý ở tầng domain
     Sử dụng các thuật ngữ chung để xây dựng nghệ thống như Ubitous language, context boundary, value object...
+
+## Mô tả nghiệp vụ và chức năng trong hệ thống
+
+### Khách vãng lai (Không có tài khoản)
+    Truy cập website:
+        => Xem danh sách dịch vụ đang được triển khai của hệ thống
+        => Xem chi tiết dịch vụ
+        => Đăng ký tài khoản để trở thành người dùng của hệ thống
+        => Xem các thông tin cơ bản được hiển thị bên trong website ở màn hình trang chủ (Liên hệ/Thông tin công ty/...)
+### Người dùng (Có tài khoản mức khách hàng)
+    Bao gồm các chức năng cơ bản dành cho Khách vãng lai, ngoài ra còn có:
+        => Yêu cầu đặt tour -> điền thông tin hành khách -> xác nhận đặt tour -> hoàn tất thanh toán
+        => Quản lý tài khoản -> Cập nhật thông tin cá nhân
+        => Quản lý lịch sử đặt tour và thanh toán -> Xem danh sách các tour đã đặt (bao gồm đặt thành công, thất bại, quá hạn...)
+### Nhân viên hệ thống (Có tài khoản dành cho việc truy cập hệ thống)
+    Đối với tài khoản hệ thống mức nhân viên
+        => Đặt tour cho khách hàng liên hệ qua tổng đài hoặc qua sale
+        => Xem phân công
+    Đối với tài khoản hệ thống mức quản lý
+        => Quản lý thông tin nhân viên
+        => Phân công công việc
+    Đối với tài khoản hệ thống mức admin
+        => Quản lý và triển khai tour
+        => Xem báo cáo thống kê doanh thu
+        => Quản lý tài khoản nhân viên hệ thống...
