@@ -46,3 +46,5 @@
         => Quản lý và triển khai tour
         => Xem báo cáo thống kê doanh thu
         => Quản lý tài khoản nhân viên hệ thống...
+### Luồng nghiệp vụ
+    - Đặt tour : Request -> Thêm BookingTour -> Thêm hành khách -> Thêm hóa đơn -> Request thanh toán -> Thêm Payment.

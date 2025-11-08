@@ -62,7 +62,7 @@ public class BookingRepository : IBookingRepository
     public async Task<Booking?> GetBookingByIdAsync(BookingId bookingId, CancellationToken ct)
     {
         string sql = "select id,user_id,tour_instance_id,total_amount,total_slots,booking_status from bookings where id = @Id";
-        await using NpgsqlCommand cmd = new NpgsqlCommand(sql, _unitOfWork.Connection, _unitOfWork.Transaction);
+        await using NpgsqlCommand cmd = new NpgsqlCommand(sql, _unitOfWork.Connection);
         cmd.Parameters.Add(new NpgsqlParameter("@Id", bookingId.Value));
         await using NpgsqlDataReader reader = await cmd.ExecuteReaderAsync(ct);
         if (await reader.ReadAsync(ct))

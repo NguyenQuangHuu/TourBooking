@@ -1,6 +1,7 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using QuanLySanPham.Application.Features.Commands.Payments;
+using QuanLySanPham.Application.Features.Queries.Payments;
 using QuanLySanPham.Domain.Aggregates.Payments;
 using QuanLySanPham.Domain.ValueObjects;
 using QuanLySanPham.Domain.ValueObjects.Ids;
@@ -17,15 +18,22 @@ public class PaymentsController: Controller
     {
         _mediator = mediator;
     }
-    [HttpPost("{invoiceId}/create-payment")]
-    public async Task<Result<Payment>> Payment([FromRoute] Guid invoiceId,[FromBody] CreatePaymentRequest request, CancellationToken cancellationToken)
+    [HttpPost]
+    public async Task<Result<Payment>> CreatePayment([FromBody] CreatePaymentRequest request, CancellationToken cancellationToken)
     {
-        InvoiceId id = (InvoiceId)invoiceId;
+        InvoiceId id = (InvoiceId)request.InvoiceId;
         Money money = new Money(request.TotalAmount);
         var cmd = new CreatePaymentCommand(id,money);
         var result =  await _mediator.Send(cmd,cancellationToken);
         return result;
     }
-    
-    
+
+    [HttpGet("{paymentId}")]
+    public async Task<Result<Payment>> GetPayment([FromRoute] Guid paymentId, CancellationToken cancellationToken)
+    {
+        PaymentId id = (PaymentId)paymentId;
+        var command = new GetPaymentByIdQuery(id);
+        var result = await _mediator.Send(command, cancellationToken);
+        return result;
+    }
 }

@@ -37,7 +37,7 @@ public class PaymentRepository : IPaymentRepository
     public async Task<Payment?> GetAsync(PaymentId id, CancellationToken ct)
     {
         string sql = "select id,created_at,amount,invoice_id,payment_status from payments where id=@id";
-        await using NpgsqlCommand cmd = new NpgsqlCommand(sql, _unitOfWork.Connection, _unitOfWork.Transaction);
+        await using NpgsqlCommand cmd = new NpgsqlCommand(sql, _unitOfWork.Connection); // query không cần truyền transaction
         cmd.Parameters.Add(new NpgsqlParameter("@id", id.Value));
         await using var reader = await cmd.ExecuteReaderAsync(ct);
         if (await reader.ReadAsync(ct))
@@ -59,7 +59,7 @@ public class PaymentRepository : IPaymentRepository
     {
         string sql =
             "select id,amount,created_at,modified_at,payment_status from payments where invoice_id = @InvoiceId";
-        await using NpgsqlCommand cmd = new NpgsqlCommand(sql, _unitOfWork.Connection, _unitOfWork.Transaction);
+        await using NpgsqlCommand cmd = new NpgsqlCommand(sql, _unitOfWork.Connection);
         cmd.Parameters.Add(new NpgsqlParameter("@InvoiceId", invoiceId.Value));
         await using var reader = await cmd.ExecuteReaderAsync(ct);
         var payments = new List<Payment>();

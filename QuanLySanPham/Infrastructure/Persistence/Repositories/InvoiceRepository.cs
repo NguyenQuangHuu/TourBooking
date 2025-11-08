@@ -36,8 +36,8 @@ public class InvoiceRepository : IInvoiceRepository
 
     public async Task<Invoice?> GetInvoiceByIdAsync(InvoiceId invoiceId, CancellationToken ct)
     {
-        string sql =  "select id, booking_id,total,invoice_status from invoices where id=@InvoiceId";
-        await using NpgsqlCommand cmd = new NpgsqlCommand(sql, _unitOfWork.Connection, _unitOfWork.Transaction);
+        string sql =  "select id, booking_id,total,invoice_status,created_at from invoices where id=@InvoiceId";
+        await using NpgsqlCommand cmd = new NpgsqlCommand(sql, _unitOfWork.Connection);
         cmd.Parameters.AddWithValue("@InvoiceId", invoiceId.Value);
         await using  NpgsqlDataReader reader = await cmd.ExecuteReaderAsync(ct);
         if (await reader.ReadAsync(ct))
@@ -48,7 +48,7 @@ public class InvoiceRepository : IInvoiceRepository
                 BookingId = BookingId.From(reader.GetGuid(1)),
                 TotalAmount = new Money(reader.GetDouble(2)),
                 InvoiceStatus = InvoiceStatus.From(reader.GetString(3)),
-                CreatedOn = reader.GetDateTime(4)
+                CreatedOn = reader.IsDBNull(4) ? default : reader.GetDateTime(4)
             };
         }
         return null;

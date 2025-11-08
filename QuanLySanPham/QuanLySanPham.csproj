@@ -23,7 +23,6 @@
         <Folder Include="Application\DTO\"/>
         <Folder Include="Application\Features\Auth\Commands\" />
         <Folder Include="Application\Features\BookingTour\" />
-        <Folder Include="Application\Features\Queries\" />
         <Folder Include="Infrastructure\Externals\"/>
         <Folder Include="Infrastructure\Identities\"/>
         <Folder Include="Infrastructure\Persistence\Configurations\"/>

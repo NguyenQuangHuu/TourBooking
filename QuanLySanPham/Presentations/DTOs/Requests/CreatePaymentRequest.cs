@@ -1,3 +1,3 @@
 namespace QuanLySanPham.Presentations.DTOs.Requests;
 
-public record CreatePaymentRequest(double TotalAmount,string Currency);
+public record CreatePaymentRequest(Guid InvoiceId,double TotalAmount,string Currency);

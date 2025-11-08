@@ -40,7 +40,7 @@ public class TourManagementRepository : ITourManagementRepository
     public async Task<IReadOnlyList<TourMaster>> GetAllTourMasters(CancellationToken cancellationToken)
     {
         var sql = @"select * from tour_master";
-        await using var cmd = new NpgsqlCommand(sql, _uow.Connection, _uow.Transaction);
+        await using var cmd = new NpgsqlCommand(sql, _uow.Connection);
         await using var read = await cmd.ExecuteReaderAsync(cancellationToken);
         List<TourMaster> tourMasters = new();
         while (await read.ReadAsync(cancellationToken))
@@ -61,7 +61,7 @@ public class TourManagementRepository : ITourManagementRepository
     public async Task<TourMaster?> GetTourMasterById(TourMasterId id, CancellationToken token = default)
     {
         var sql = @"select * from tour_master where id = @TourMasterId";
-        await using var cmd = new NpgsqlCommand(sql, _uow.Connection, _uow.Transaction);
+        await using var cmd = new NpgsqlCommand(sql, _uow.Connection);
         cmd.Parameters.Add(new NpgsqlParameter("@TourMasterId", id.Value));
         await using var reader = await cmd.ExecuteReaderAsync(token);
         if (await reader.ReadAsync(token))
@@ -80,7 +80,7 @@ public class TourManagementRepository : ITourManagementRepository
         var sql =
             @"insert into tour_instance(price_per_pax,start_date,end_date,booked_slots,opened_slots,available_slots,tour_master_id)" +
             "values (@PricePerPax,@StartDate,@EndDate,@BookedSlots,@OpenedSlots,@AvailableSlots,@TourMasterId) returning id";
-        await using var cmd = new NpgsqlCommand(sql, _uow.Connection, _uow.Transaction);
+        await using var cmd = new NpgsqlCommand(sql, _uow.Connection);
         cmd.Parameters.Add(new NpgsqlParameter("@PricePerPax", tourInstance.PricePerPax.Amount));
         cmd.Parameters.Add(new NpgsqlParameter("@StartDate", tourInstance.OperationalPeriod.Start));
         cmd.Parameters.Add(new NpgsqlParameter("@EndDate", tourInstance.OperationalPeriod.End));
@@ -148,7 +148,7 @@ public class TourManagementRepository : ITourManagementRepository
         CancellationToken token = default)
     {
         var sql = "select * from tour_instance where tour_master_id = @Id";
-        await using var cmd = new NpgsqlCommand(sql, _uow.Connection, _uow.Transaction);
+        await using var cmd = new NpgsqlCommand(sql, _uow.Connection);
         List<TourInstance> list = new();
         await using var reader = await cmd.ExecuteReaderAsync(token);
         while (await reader.ReadAsync(token))
@@ -170,7 +170,7 @@ public class TourManagementRepository : ITourManagementRepository
     public async Task<TourInstance?> GetTourInstanceByIdAsync(TourInstanceId tourInstanceId, CancellationToken ct)
     {
         string sql = "select * from tour_instance where id = @TourInstanceId";
-        await using var command = new NpgsqlCommand(sql, _uow.Connection, _uow.Transaction);
+        await using var command = new NpgsqlCommand(sql, _uow.Connection);
         command.Parameters.Add(new NpgsqlParameter("@TourInstanceId", tourInstanceId.Value));
         await using var reader = await command.ExecuteReaderAsync(ct);
         if (await reader.ReadAsync(ct))

@@ -10,4 +10,5 @@ public interface IPaymentRepository
     
     Task<IReadOnlyList<Payment>> GetPaymentsByInvoiceIdAsync(InvoiceId invoiceId,CancellationToken ct);
     Task<Payment> UpdateAsync(Payment payment, CancellationToken ct);
+    
 }

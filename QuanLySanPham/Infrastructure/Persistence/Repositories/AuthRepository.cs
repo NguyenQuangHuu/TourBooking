@@ -37,7 +37,7 @@ public class AuthRepository : IAuthRepository
     public async Task<User?> GetUserByUsernameAsync(string username, CancellationToken ct)
     {
         var sql = "select * from users where username = @Username";
-        await using var command = new NpgsqlCommand(sql, _unitOfWork.Connection, _unitOfWork.Transaction);
+        await using var command = new NpgsqlCommand(sql, _unitOfWork.Connection);
         command.Parameters.Add(new NpgsqlParameter("@Username", username));
         await using var reader = await command.ExecuteReaderAsync(ct);
         if (await reader.ReadAsync(ct))
@@ -70,7 +70,7 @@ public class AuthRepository : IAuthRepository
     {
         var sql =
             "select id,username,password,email,phone_number,user_type,refresh_token,rf_token_expire from users where refresh_token = @RfToken";
-        await using var command = new NpgsqlCommand(sql, _unitOfWork.Connection, _unitOfWork.Transaction);
+        await using var command = new NpgsqlCommand(sql, _unitOfWork.Connection);
         command.Parameters.Add(new NpgsqlParameter("@RfToken", refreshToken));
         await using var reader = await command.ExecuteReaderAsync(ct);
         if (await reader.ReadAsync(ct))

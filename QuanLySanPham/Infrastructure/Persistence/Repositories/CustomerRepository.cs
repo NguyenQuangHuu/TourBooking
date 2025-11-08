@@ -49,7 +49,7 @@ public class CustomerRepository : ICustomerRepository
     public async Task<Customer?> GetCustomerByIdAsync(CustomerId id, CancellationToken token)
     {
         string sql = "select c.id, c.display_name, c.gender, c.address, c.identity_card_no, c.date_of_birth, c.user_id from customers c where c.id = @Id";
-        await using var cmd = new NpgsqlCommand(sql, _unitOfWork.Connection, _unitOfWork.Transaction);
+        await using var cmd = new NpgsqlCommand(sql, _unitOfWork.Connection);
         cmd.Parameters.Add(new NpgsqlParameter("@Id", id.Value));
         await using var reader = await cmd.ExecuteReaderAsync(token);
         if (!await reader.ReadAsync(token))

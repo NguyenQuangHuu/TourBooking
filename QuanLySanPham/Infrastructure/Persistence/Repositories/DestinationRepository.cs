@@ -32,7 +32,7 @@ public class DestinationRepository : IDestinationRepository
     public async Task<Destination?> GetDestinationByNameAsync(string name, CancellationToken token)
     {
         var sql = @"SELECT * FROM destinations WHERE name = @Name";
-        await using var command = new NpgsqlCommand(sql, _unitOfWork.Connection, _unitOfWork.Transaction);
+        await using var command = new NpgsqlCommand(sql, _unitOfWork.Connection);
         command.Parameters.Add(new NpgsqlParameter("@Name", name));
         await using var reader = await command.ExecuteReaderAsync(token);
         if (await reader.ReadAsync(token))
@@ -43,15 +43,14 @@ public class DestinationRepository : IDestinationRepository
                 Country = reader.GetString(2),
                 IsOverSea = reader.GetBoolean(3)
             };
-
         return null;
     }
 
     public async Task<Destination?> GetDestinationByIdAsync(DestinationId id, CancellationToken token)
     {
         var sql = "select d.id ,d.name,d.country,d.is_oversea from destinations d where d.id = @Id";
-        await using var command = new NpgsqlCommand(sql, _unitOfWork.Connection, _unitOfWork.Transaction);
-        command.Parameters.Add(new NpgsqlParameter(@"id", id));
+        await using var command = new NpgsqlCommand(sql, _unitOfWork.Connection);
+        command.Parameters.Add(new NpgsqlParameter(@"id", id.Value));
         await using var reader = await command.ExecuteReaderAsync(token);
         if (await reader.ReadAsync(token))
         {
@@ -72,7 +71,7 @@ public class DestinationRepository : IDestinationRepository
     {
         var sql =
             "select d.id ,d.name,d.country,d.is_oversea,p.id ,p.name,p.duration,p.poi_type,p.description,p.destination_id from destinations d inner join destination_poi p on d.id = p.destination_id where d.id = @Id";
-        await using var command = new NpgsqlCommand(sql, _unitOfWork.Connection, _unitOfWork.Transaction);
+        await using var command = new NpgsqlCommand(sql, _unitOfWork.Connection);
         command.Parameters.Add(new NpgsqlParameter("@Id", id));
         await using var reader = await command.ExecuteReaderAsync(token);
         Destination? des = null;
@@ -123,7 +122,7 @@ public class DestinationRepository : IDestinationRepository
     public async Task<IReadOnlyList<Destination>?> GetAllDestinationsAsync(CancellationToken token)
     {
         var sql = "select * from destinations";
-        await using var command = new NpgsqlCommand(sql, _unitOfWork.Connection, _unitOfWork.Transaction);
+        await using var command = new NpgsqlCommand(sql, _unitOfWork.Connection);
         Dictionary<DestinationId, Destination> destinations = new();
         await using var reader = await command.ExecuteReaderAsync(token);
         while (await reader.ReadAsync(token))
@@ -146,7 +145,7 @@ public class DestinationRepository : IDestinationRepository
     public async Task<PointOfInterest?> GetPointOfInterestByIdAsync(PointOfInterestId id, CancellationToken token)
     {
         var sql = @"select * from destination_poi where id = @Id";
-        await using var command = new NpgsqlCommand(sql, _unitOfWork.Connection, _unitOfWork.Transaction);
+        await using var command = new NpgsqlCommand(sql, _unitOfWork.Connection);
         command.Parameters.Add(new NpgsqlParameter("@Id", id.Value));
         await using var reader = await command.ExecuteReaderAsync(token);
         if (await reader.ReadAsync(token))
@@ -166,7 +165,7 @@ public class DestinationRepository : IDestinationRepository
         DestinationId destinationId, CancellationToken token)
     {
         var sql = @"select * from destination_poi where destination_id = @Id";
-        await using var command = new NpgsqlCommand(sql, _unitOfWork.Connection, _unitOfWork.Transaction);
+        await using var command = new NpgsqlCommand(sql, _unitOfWork.Connection);
         command.Parameters.Add(new NpgsqlParameter("@Id", destinationId.Value));
         List<PointOfInterest> list = new();
         await using var reader = await command.ExecuteReaderAsync(token);
