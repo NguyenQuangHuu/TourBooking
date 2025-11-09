@@ -41,7 +41,7 @@ public class BookingTourCommandHandler : IRequestHandler<BookingTourCommand, Res
     {
         try
         {
-            await _unitOfWork.BeginAsync(ct);
+            await _unitOfWork.BeginTransactionAsync(ct);
             var tour = await _tourManagementRepository.GetTourInstanceByIdAsync(request.TourInstanceId, ct);
             if (tour is null)
             {

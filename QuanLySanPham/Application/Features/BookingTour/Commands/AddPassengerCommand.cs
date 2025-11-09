@@ -28,7 +28,7 @@ public class AddPassengerCommandHandler : IRequestHandler<AddPassengerCommand, R
     }
     public async Task<Result<BookingId>> Handle(AddPassengerCommand request, CancellationToken ct)
     {
-        await _unitOfWork.BeginAsync(ct);
+        await _unitOfWork.BeginTransactionAsync(ct);
         var booking = await _bookingRepository.GetBookingByIdAsync(request.BookingId, ct);
         if (booking is null)
         {

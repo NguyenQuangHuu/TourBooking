@@ -31,7 +31,7 @@ public class GetCustomerByIdHandler : IRequestHandler<GetCustomerById, Result<Cu
     {
         try
         {
-            await _unitOfWork.BeginAsync(cancellationToken);
+            await _unitOfWork.BeginTransactionAsync(cancellationToken);
             Customer customer = await _customerRepository.GetCustomerByIdAsync(request.CustomerId, cancellationToken);
             return Result<Customer>.Success(customer, StatusCodes.Status200OK);
         }

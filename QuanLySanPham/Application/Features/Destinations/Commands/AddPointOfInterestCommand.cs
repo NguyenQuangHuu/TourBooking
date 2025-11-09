@@ -29,7 +29,7 @@ public class AddPointOfInterestCommandHandler : IRequestHandler<AddPointOfIntere
 
     public async Task<PointOfInterestId?> Handle(AddPointOfInterestCommand request, CancellationToken ct)
     {
-        await _unitOfWork.BeginAsync(ct);
+        await _unitOfWork.BeginTransactionAsync(ct);
         var destinationId = DestinationId.From(request.Id);
         var exist = await _destinationRepository.GetDestinationByIdAsync(destinationId, ct);
         if (exist is null) throw new NotFoundException("Destination not found");

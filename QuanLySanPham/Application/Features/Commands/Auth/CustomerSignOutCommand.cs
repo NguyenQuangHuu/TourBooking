@@ -20,7 +20,7 @@ public class CustomerSignOutCommandHandler : IRequestHandler<CustomerSignOutComm
     }
     public async Task<Result<string>> Handle(CustomerSignOutCommand command, CancellationToken ct)
     {
-        await _unitOfWork.BeginAsync(ct);
+        await _unitOfWork.BeginTransactionAsync(ct);
         try
         {
             var user = await _authRepository.GetUserByUsernameAsync(command.Username, ct);

@@ -22,7 +22,7 @@ public class CustomerUpdateInformationCommandHandler : IRequestHandler<CustomerU
     }
     public async Task<Customer> Handle(CustomerUpdateInformationCommand request, CancellationToken ct)
     {
-        await _unitOfWork.BeginAsync(ct);
+        await _unitOfWork.BeginTransactionAsync(ct);
         Customer customer = new Customer(request.DisplayName, request.DateOfBirth, request.Gender,
             request.IdentityCardNumber, request.Address, request.UserId);
         var result = await _customerRepository.CreateNewCustomerInformationAsync(customer, ct);

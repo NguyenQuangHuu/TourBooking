@@ -24,7 +24,7 @@ public class GenerateTokenCommandHandler : IRequestHandler<GenerateTokenCommand,
 
     public async Task<LoginResponse> Handle(GenerateTokenCommand request, CancellationToken ct)
     {
-        await _unitOfWork.BeginAsync(ct);
+        await _unitOfWork.BeginTransactionAsync(ct);
         var user = await _authRepository.GetUserByRefreshTokenAsync(request.RefreshToken, ct);
         if (user is null)
         {

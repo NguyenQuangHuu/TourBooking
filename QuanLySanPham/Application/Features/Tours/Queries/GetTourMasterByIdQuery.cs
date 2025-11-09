@@ -12,7 +12,7 @@ public class GetTourMasterByIdHandler(ITourManagementRepository repo, IUnitOfWor
 {
     public async Task<TourMaster?> Handle(GetTourMasterByIdQuery request, CancellationToken cancellationToken)
     {
-        await uow.BeginAsync(cancellationToken);
+        await uow.BeginTransactionAsync(cancellationToken);
         return await repo.GetTourMasterById(TourMasterId.From(request.Id), cancellationToken);
     }
 }

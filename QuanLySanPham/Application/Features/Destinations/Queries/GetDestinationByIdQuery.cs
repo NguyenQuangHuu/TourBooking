@@ -12,7 +12,7 @@ public class GetDestinationByIdQueryHandler(IUnitOfWork unitOfWork, IDestination
 {
     public async Task<Destination?> Handle(GetDestinationByIdQuery request, CancellationToken ct)
     {
-        await unitOfWork.BeginAsync(ct);
+        await unitOfWork.BeginTransactionAsync(ct);
         var destinationId = DestinationId.From(request.Id);
         return await destinationRepository.GetDestinationByIdAsync(destinationId, ct);
     }

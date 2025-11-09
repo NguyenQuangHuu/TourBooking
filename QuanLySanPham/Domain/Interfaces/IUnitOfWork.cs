@@ -8,7 +8,7 @@ public interface IUnitOfWork : IAsyncDisposable
 {
     NpgsqlConnection Connection { get; }
     NpgsqlTransaction Transaction { get; }
-    Task BeginAsync(CancellationToken cancellationToken);
+    Task BeginTransactionAsync(CancellationToken cancellationToken);
     Task CommitAsync(CancellationToken cancellationToken);
     Task RollbackAsync(CancellationToken cancellationToken);
 }

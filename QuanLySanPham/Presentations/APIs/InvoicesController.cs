@@ -1,5 +1,6 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using QuanLySanPham.Application.Features.Commands;
 using QuanLySanPham.Application.Features.Queries.Invoices;
 using QuanLySanPham.Domain.Aggregates.Invoices;
 using QuanLySanPham.Domain.ValueObjects.Ids;
@@ -23,5 +24,13 @@ public class InvoicesController : Controller
         InvoiceId id = (InvoiceId)invoiceId;
         var query = new GetInvoiceByIdQuery(id);
         return await _mediator.Send(query,ct);
+    }
+
+    [HttpGet("{invoiceId}/payments")]
+    public async Task<IActionResult> PayInvoice(Guid invoiceId, CancellationToken ct)
+    {
+        var cmd = new PayInvoiceCommand((InvoiceId)invoiceId);
+        await _mediator.Send(cmd, ct);
+        return Ok();
     }
 }

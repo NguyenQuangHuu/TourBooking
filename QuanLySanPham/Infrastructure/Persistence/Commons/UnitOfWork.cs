@@ -12,8 +12,8 @@ public class UnitOfWork : IUnitOfWork,ITrackedEntities,IDomainEventDispatcher
     private readonly IDbContext _dbContext;
     private readonly IMediator _mediator;
     private readonly List<IEntity> _baseEntities = new();
-    public NpgsqlConnection Connection { get; private set; } = null!;
-    public NpgsqlTransaction Transaction { get; private set; } = null!;
+    public NpgsqlConnection Connection { get; private set; }
+    public NpgsqlTransaction Transaction { get; private set; }
 
     private UnitOfWork()
     {
@@ -25,8 +25,8 @@ public class UnitOfWork : IUnitOfWork,ITrackedEntities,IDomainEventDispatcher
         _mediator = mediator;
         _logger = logger;
     }
-
-    public async Task BeginAsync(CancellationToken token)
+    
+    public async Task BeginTransactionAsync(CancellationToken token)
     {
         Connection = await _dbContext.CreateConnectionAsync(token);
         Transaction = await Connection.BeginTransactionAsync(token);

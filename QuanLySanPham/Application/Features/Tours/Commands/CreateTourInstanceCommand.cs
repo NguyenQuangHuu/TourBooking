@@ -28,7 +28,7 @@ public class CreateTourInstanceCommandHandler(ITourManagementRepository repo, IU
 {
     public async Task<TourInstanceId?> Handle(CreateTourInstanceCommand request, CancellationToken cancellationToken)
     {
-        await uow.BeginAsync(cancellationToken);
+        await uow.BeginTransactionAsync(cancellationToken);
         var tourInstance = new TourInstance(request.OperationalPeriod, request.SlotInfo, request.PricePerPax,
             request.TourMasterId);
         tourInstance.AddDomainEvent(new TourInstanceCreatedEvent(tourInstance.Id));

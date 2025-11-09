@@ -12,7 +12,7 @@ public class GetAllDestinationQueryHandler(IUnitOfWork unitOfWork, IDestinationR
     public async Task<IReadOnlyList<Destination>?> Handle(GetAllDestinationsQuery request,
         CancellationToken ct)
     {
-        await unitOfWork.BeginAsync(ct);
+        await unitOfWork.BeginTransactionAsync(ct);
         return await destinationRepository.GetAllDestinationsAsync(ct);
     }
 }

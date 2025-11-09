@@ -29,7 +29,7 @@ public class CreatePaymentCommandHandler : IRequestHandler<CreatePaymentCommand,
 
     public async Task<Result<Payment>> Handle(CreatePaymentCommand command, CancellationToken cancellationToken)
     {
-        await _unitOfWork.BeginAsync(cancellationToken);
+        await _unitOfWork.BeginTransactionAsync(cancellationToken);
         var invoiceId = await _invoiceRepository.GetInvoiceByIdAsync(command.InvoiceId, cancellationToken);
         if (invoiceId is null)
         {

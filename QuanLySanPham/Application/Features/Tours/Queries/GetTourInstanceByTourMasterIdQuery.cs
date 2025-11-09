@@ -31,7 +31,7 @@ public class
     public async Task<IReadOnlyList<TourInstance>> Handle(GetTourInstanceByTourMasterIdQuery query,
         CancellationToken cancellationToken)
     {
-        await _uow.BeginAsync(cancellationToken);
+        await _uow.BeginTransactionAsync(cancellationToken);
         return await _repository.GetTourInstancesByTourMasterIdAsync(query.TourMasterId, cancellationToken);
     }
 }

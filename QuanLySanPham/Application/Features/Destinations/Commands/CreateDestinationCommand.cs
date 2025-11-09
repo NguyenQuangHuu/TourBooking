@@ -21,7 +21,7 @@ public class CreateDestinationCommandHandler : IRequestHandler<CreateDestination
 
     public async Task<DestinationId?> Handle(CreateDestinationCommand request, CancellationToken ct)
     {
-        await _unitOfWork.BeginAsync(ct);
+        await _unitOfWork.BeginTransactionAsync(ct);
         var destination = await _destinationRepository.GetDestinationByNameAsync(request.Name, ct);
         if (destination is not null) throw new ExistException("Destination with that name already exists");
         var newDestination = new Destination(request.Name, request.Country, request.IsOverSea);

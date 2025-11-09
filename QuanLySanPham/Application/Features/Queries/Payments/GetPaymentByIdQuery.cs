@@ -23,7 +23,7 @@ public class GetPaymentByIdQueryHandler : IRequestHandler<GetPaymentByIdQuery,Re
     }
     public async Task<Result<Payment>> Handle(GetPaymentByIdQuery query, CancellationToken cancellationToken)
     {
-        await _unitOfWork.BeginAsync(cancellationToken);
+        await _unitOfWork.BeginTransactionAsync(cancellationToken);
         var result = await _paymentRepository.GetAsync(query.PaymentId, cancellationToken);
         if (result is null)
         {

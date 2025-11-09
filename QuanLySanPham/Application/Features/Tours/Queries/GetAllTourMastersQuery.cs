@@ -12,7 +12,7 @@ public class GetAllTourMasterHandler(ITourManagementRepository repo, IUnitOfWork
     public async Task<IReadOnlyList<TourMaster>> Handle(GetAllTourMastersQuery request,
         CancellationToken ct)
     {
-        await unitOfWork.BeginAsync(ct);
+        await unitOfWork.BeginTransactionAsync(ct);
         return await repo.GetAllTourMasters(ct);
     }
 }

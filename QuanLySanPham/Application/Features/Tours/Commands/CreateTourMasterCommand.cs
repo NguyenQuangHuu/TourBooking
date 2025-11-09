@@ -42,7 +42,7 @@ public class CreateTourMasterCommandHandler(
 {
     public async Task<TourMasterId?> Handle(CreateTourMasterCommand request, CancellationToken cancellationToken)
     {
-        await unitOfWork.BeginAsync(cancellationToken);
+        await unitOfWork.BeginTransactionAsync(cancellationToken);
         foreach (var value in request.Destinations)
         {
             var exists = await destinationRepo.GetDestinationByIdAsync(value.DestinationId, cancellationToken);

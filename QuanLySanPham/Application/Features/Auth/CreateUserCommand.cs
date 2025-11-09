@@ -30,7 +30,7 @@ public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, UserI
 
     public async Task<UserId?> Handle(CreateUserCommand request, CancellationToken cancellationToken)
     {
-        await _unitOfWork.BeginAsync(cancellationToken);
+        await _unitOfWork.BeginTransactionAsync(cancellationToken);
         var exists = await _repository.GetUserByUsernameAsync(request.UsernameDto, cancellationToken);
         if (exists is not null) throw new ExistException("User with that username already exists");
 

@@ -13,7 +13,7 @@ public class GetPoiByDestinationIdQueryHandler(IDestinationRepository repo, IUni
     public async Task<IReadOnlyList<PointOfInterest>?> Handle(GetPoiByDestinationIdQuery request,
         CancellationToken ct)
     {
-        await uow.BeginAsync(ct);
+        await uow.BeginTransactionAsync(ct);
         return await repo.GetPointOfInterestByDestinationIdAsync(request.DestinationId, ct);
     }
 }

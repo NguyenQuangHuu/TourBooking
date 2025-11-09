@@ -26,7 +26,7 @@ public class LoginQueryHandler : IRequestHandler<LoginQuery, LoginResponse>
 
     public async Task<LoginResponse> Handle(LoginQuery request, CancellationToken ct)
     {
-        await _unitOfWork.BeginAsync(ct);
+        await _unitOfWork.BeginTransactionAsync(ct);
         var user = await _repository.GetUserByUsernameAsync(request.Username, ct);
         if (user is null) throw new AuthException("Username is not exist");
 

@@ -29,7 +29,7 @@ public class TourSeatsReversedEventHandler : INotificationHandler<TourSeatsRever
     {
         try
         {
-            await _unitOfWork.BeginAsync(ct);
+            await _unitOfWork.BeginTransactionAsync(ct);
             var tourInstance = notification.TourInstance;
             tourInstance.SeatReverse(notification.Seats);
             var result = await _tourManagementRepository.UpdateTourInstanceAsync(tourInstance, ct);

@@ -28,7 +28,7 @@ public class AddedPassengerEventHandler : INotificationHandler<AddedPassengerEve
     
     public async Task Handle(AddedPassengerEvent notification, CancellationToken cancellationToken)
     {
-        await _unitOfWork.BeginAsync(cancellationToken);
+        await _unitOfWork.BeginTransactionAsync(cancellationToken);
         var invoice = new Invoice(notification.Booking.Id, notification.Booking.UserId,notification.Booking.TotalAmount);
         var result = await _invoiceRepository.CreateInvoiceAsync(invoice,cancellationToken);
         _logger.LogInformation($"Tạo hóa đơn thành công : {result.Id}!");
